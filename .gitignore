@@ -1,0 +1,18 @@
+# Visual Studio and MSBuild output
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.pdb
+
+# Local build tools and game dependencies
+nuget_compilers_*/
+*.nupkg
+*.dll
+
+# Reverse-engineering notes and one-off diagnostics
+*.il
+*.res
+*.bak
+tmp.json
