@@ -15,6 +15,16 @@ namespace ResumableJobProgress
 		private static RecipeDef recipeDefOf_MakeStoneBlocksAny = null;
 		private static List<RecipeDef> recipeDefResumable = null;
 
+		public static TaggedString TranslateWithFallback(string key, string englishFallback)
+		{
+			// Fall back to English when the selected translation is unavailable or blank.
+			if (Translator.TryTranslate(key, out TaggedString translated) && !translated.NullOrEmpty())
+			{
+				return translated;
+			}
+			return englishFallback;
+		}
+
 		public static RecipeDef KeyFromRecipe(RecipeDef recipeDef)
 		{
 			if (recipeDefResumable.NullOrEmpty())

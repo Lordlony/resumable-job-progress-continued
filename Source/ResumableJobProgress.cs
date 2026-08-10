@@ -27,7 +27,7 @@ namespace ResumableJobProgress
 
 		public override string SettingsCategory()
 		{
-			return "ResumableJobProgress.Title".Translate();
+			return Utility.TranslateWithFallback("ResumableJobProgress.Title", "Resumable Job Progress");
 		}
 	}
 }

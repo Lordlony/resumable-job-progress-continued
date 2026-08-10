@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LanguageData>
+
+  <!-- EN: Resumable Job Progress -->
+  <ResumableJobProgress.Title>Resumable Job Progress</ResumableJobProgress.Title>
+  <!-- EN: Require a matching ingredient to resume cooking -->
+  <ResumableJobProgress.StrictIngredient.label>Require a matching ingredient to resume cooking</ResumableJobProgress.StrictIngredient.label>
+  <!-- EN: A cooking job can resume only if at least one ingredient has the same type as an ingredient used before interruption. -->
+  <ResumableJobProgress.StrictIngredient.desc>A cooking job can resume only if at least one ingredient has the same type as an ingredient used before interruption.</ResumableJobProgress.StrictIngredient.desc>
+  <!-- EN: Disable progress resuming for: -->
+  <ResumableJobProgress.DisablesResuming>Disable progress resuming for:</ResumableJobProgress.DisablesResuming>
+
+</LanguageData>

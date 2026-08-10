@@ -40,7 +40,9 @@ namespace ResumableJobProgress
 						var driver = __instance.curDriver;
 						if (driver is JobDriver_DoBill driverDoBill)
 						{
-							RecipeDef recipe = Utility.KeyFromRecipe(job.RecipeDef); // 石材の切り出しは全て同一の製法として扱う
+							// 石材の切り出しは全て同一の製法として扱う
+							// English: Treat all stone-block cutting recipes as the same recipe.
+							RecipeDef recipe = Utility.KeyFromRecipe(job.RecipeDef);
 							if (recipe is not null && !recipe.UsesUnfinishedThing)
 							{
 								var workLeft = AccessTools.FieldRefAccess<JobDriver_DoBill, float>(driverDoBill, "workLeft");
@@ -69,6 +71,7 @@ namespace ResumableJobProgress
 										ResumeDictionary.Instance.SetResumeWorkLeft(job.targetB.Thing, recipe, workLeft, efficiency, baseWorkAmount);
 									}
 									// 中断した時点でスキル経験を精算
+									// English: Settle skill experience earned up to the interruption.
 									if (recipe.workSkill is not null)
 									{
 										float xp = driverDoBill.ticksSpentDoingRecipeWork * 0.1f * recipe.workSkillLearnFactor;
@@ -187,7 +190,9 @@ if (job.targetA.Thing is Plant plant)
 				{
 					return;
 				}
-				RecipeDef recipe = Utility.KeyFromRecipe(___recipe); // 石材の切り出しは全て同一の製法として扱う
+				// 石材の切り出しは全て同一の製法として扱う
+				// English: Treat all stone-block cutting recipes as the same recipe.
+				RecipeDef recipe = Utility.KeyFromRecipe(___recipe);
 				if (recipe is not null && !recipe.UsesUnfinishedThing)
 				{
 					var driver = billDoer.jobs.curDriver;
@@ -375,7 +380,7 @@ if (job.targetA.Thing is Plant plant)
 
 								if (actor.RaceProps.Humanlike && property.harvestFailable && !plant.Blighted && Rand.Value > efficiency)
 								{
-									MoteMaker.ThrowText((actor.DrawPos + plant.DrawPos) / 2f, plant.Map, "TextMote_HarvestFailed".Translate(), 3.65f);
+									MoteMaker.ThrowText((actor.DrawPos + plant.DrawPos) / 2f, plant.Map, Utility.TranslateWithFallback("TextMote_HarvestFailed", "Harvest failed"), 3.65f);
 								}
 								else
 								{

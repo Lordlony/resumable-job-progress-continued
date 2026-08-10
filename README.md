@@ -6,7 +6,7 @@ The original mod and its author remain credited. Lordlony maintains the 1.6 upda
 
 ## Included source
 
-`Source/` contains the current C# source and Visual Studio solution for the 1.6 build. It deliberately excludes RimWorld, Harmony, compiler binaries, generated output, editor caches, and historic backup files.
+`Source/` contains the current C# source and Visual Studio solution for the 1.6 build. `Languages/` contains the keyed English and Japanese translations shipped with the 1.6 package. The repository deliberately excludes RimWorld, Harmony, compiler binaries, generated output, editor caches, and historic backup files.
 
 No license has been added by this continuation. This repository does not claim ownership of denev's original work or grant rights beyond those held by the original author.
 
