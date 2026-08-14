@@ -152,6 +152,39 @@ namespace ResumableJobProgress
 			}
 		}
 
+		class ResumeSow : IExposable
+		{
+			private Map keyMap;
+			private IntVec3 keyCell;
+			private ThingDef keyPlantDef;
+			private float valueWorkDone;
+
+			public Map Map => keyMap;
+			public IntVec3 Cell => keyCell;
+			public ThingDef PlantDef => keyPlantDef;
+			public float WorkDone => valueWorkDone;
+
+			public ResumeSow()
+			{
+			}
+
+			public ResumeSow(Map map, IntVec3 cell, ThingDef plantDef, float workDone)
+			{
+				keyMap = map;
+				keyCell = cell;
+				keyPlantDef = plantDef;
+				valueWorkDone = workDone;
+			}
+
+			public void ExposeData()
+			{
+				Scribe_References.Look(ref keyMap, "targetMap");
+				Scribe_Values.Look(ref keyCell, "targetCell");
+				Scribe_Defs.Look(ref keyPlantDef, "plantDef");
+				Scribe_Values.Look(ref valueWorkDone, "workDone");
+			}
+		}
+
 		private Dictionary<(TargetInfo target, Def def), (float, float)> resumeJobWorkLefts = new Dictionary<(TargetInfo target, Def def), (float, float)>();
 
 		public bool GetResumeWorkLeft(Map map, IntVec3 cell, Def def, out float workLeft, out float efficiencyIntegral)
@@ -338,11 +371,13 @@ namespace ResumableJobProgress
 		{
 			resumeJobWorkLeftsTemp.Clear();
 			resumeJobWorkDonesTemp.Clear();
+			resumeSowJobWorkDonesTemp.Clear();
 			resumeBillWorkLeftsTemp.Clear();
 		}
 
 		private List<ResumeJob> resumeJobWorkLeftsTemp = new List<ResumeJob>();
 		private List<ResumeJob> resumeJobWorkDonesTemp = new List<ResumeJob>();
+		private List<ResumeSow> resumeSowJobWorkDonesTemp = new List<ResumeSow>();
 		private List<ResumeBill> resumeBillWorkLeftsTemp = new List<ResumeBill>();
 
 		public void ExposeData()
@@ -355,6 +390,7 @@ namespace ResumableJobProgress
 					{
 						resumeJobWorkLeftsTemp.Clear();
 						resumeJobWorkDonesTemp.Clear();
+						resumeSowJobWorkDonesTemp.Clear();
 						resumeBillWorkLeftsTemp.Clear();
 						foreach (var resumeJobWorkLeft in resumeJobWorkLefts)
 						{
@@ -374,6 +410,15 @@ namespace ResumableJobProgress
 								resumeJobWorkDonesTemp.Add(new ResumeJob(target, def, workDone, efficiencyIntegral));
 							}
 						}
+						// Preserve interrupted sowing progress so it survives a save/reload cycle.
+						foreach (var resumeSowJobWorkDone in resumeSowJobWorkDones)
+						{
+							var (map, cell, plantDef) = resumeSowJobWorkDone.Key;
+							if (map is not null && cell.IsValid && plantDef is not null)
+							{
+								resumeSowJobWorkDonesTemp.Add(new ResumeSow(map, cell, plantDef, resumeSowJobWorkDone.Value));
+							}
+						}
 						foreach (var resumeBillWorkLeft in resumeBillWorkLefts)
 						{
 							var (recipe, workBench) = resumeBillWorkLeft.Key;
@@ -386,7 +431,13 @@ namespace ResumableJobProgress
 					}
 					Scribe_Collections.Look(ref resumeJobWorkLeftsTemp, "resumeJobWorkLefts", LookMode.Deep);
 					Scribe_Collections.Look(ref resumeJobWorkDonesTemp, "resumeJobWorkDones", LookMode.Deep);
+					Scribe_Collections.Look(ref resumeSowJobWorkDonesTemp, "resumeSowJobWorkDones", LookMode.Deep);
 					Scribe_Collections.Look(ref resumeBillWorkLeftsTemp, "resumeBillWorkLefts", LookMode.Deep);
+					// Missing nodes are valid in saves from earlier versions of this mod.
+					resumeJobWorkLeftsTemp ??= new List<ResumeJob>();
+					resumeJobWorkDonesTemp ??= new List<ResumeJob>();
+					resumeSowJobWorkDonesTemp ??= new List<ResumeSow>();
+					resumeBillWorkLeftsTemp ??= new List<ResumeBill>();
 				}
 				finally
 				{
@@ -399,6 +450,7 @@ namespace ResumableJobProgress
 		{
 			var newLeftList = new Dictionary<(TargetInfo, Def), (float, float)>();
 			var newDoneList = new Dictionary<(Thing, Def), (float, float)>();
+			var newSowList = new Dictionary<(Map, IntVec3, ThingDef), float>();
 			var newBillList = new Dictionary<(RecipeDef, Building_WorkTable), (List<ThingDef>, float)>();
 			foreach (var resumeJob in resumeJobWorkLeftsTemp)
 			{
@@ -443,12 +495,20 @@ namespace ResumableJobProgress
 					Log.Message("[ResumeJobProgress] invalid data loading!");
 				}
 			}
+			foreach (var resumeSow in resumeSowJobWorkDonesTemp)
+			{
+				if (resumeSow.Map is not null && resumeSow.Cell.IsValid && resumeSow.PlantDef is not null)
+				{
+					newSowList[(resumeSow.Map, resumeSow.Cell, resumeSow.PlantDef)] = resumeSow.WorkDone;
+				}
+			}
 			foreach (var resumeBillWork in resumeBillWorkLeftsTemp)
 			{
 				newBillList.Add(resumeBillWork.Key, resumeBillWork.Value);
 			}
 			resumeJobWorkLefts = newLeftList;
 			resumeJobWorkDones = newDoneList;
+			resumeSowJobWorkDones = newSowList;
 			resumeBillWorkLefts = newBillList;
 		}
 	}

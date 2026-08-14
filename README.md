@@ -2,6 +2,8 @@
 
 RimWorld 1.6 continuation of [Resumable Job Progress by denev](https://steamcommunity.com/sharedfiles/filedetails/?id=2801102127).
 
+Current release: 1.0.6 for RimWorld 1.6.
+
 The original mod and its author remain credited. Lordlony maintains the 1.6 update in this repository. This continuation will be removed or transferred at the original author's request, or if the original mod is updated.
 
 ## Included source
